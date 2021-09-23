@@ -1,8 +1,9 @@
-import numpy as np
+import numpy as np  
 import time
-import random as rd
 import matplotlib.pyplot as plt
 
+#   Llama a las implementaciones y calcula el tiempo y
+#   crea un png con la gráfica.   
 def compara_tiempos():
     puntos = 8000
     puntos_totales = 10000
@@ -41,8 +42,6 @@ def integra_mc_buc(fun, a, b, num_puntos=10000):
     I = (nDebajo / num_puntos) * areaRectangulo
     print(I)
     toc = time.process_time()
-    #tiempoEjecucion = 1000 * (toc - tic)
-    #print('Tiempo de ejecucion en bucle: ' + str(tiempoEjecucion) + '\n' + 'Resultado integral: ' + str((nDebajo / num_puntos) * areaRectangulo))
     return 1000 * (toc - tic)  
 
 #funcion que utiliza operaciones entre vectores
@@ -56,9 +55,6 @@ def integra_mc_vec(fun, a, b, num_puntos=10000):
     I = (nDebajo / num_puntos) * areaRectangulo
     print(I)
     toc = time.process_time()
-    #tiempoEjecucion = 1000 * (toc - tic)
-
-    #print('Tiempo de ejecucion en vector: ' + str(tiempoEjecucion) + '\n' + 'Resultado integral: ' + str((nDebajo / num_puntos) * areaRectangulo))
     return 1000 * (toc - tic)
 
 compara_tiempos()
