@@ -1,17 +1,22 @@
 import matplotlib.pyplot as plt
+import numpy as np
+
+#   Para importar el parseador de frame a numpy
 from pandas.io.parsers import read_csv
-
-
+#
+from mpl_toolkits.mplot3d import Axes3D
+#
+# from matplotlib.ticker import L
 
 # Lee un archivo csv pasando el nombre del fichero a leer y devuelve un array de numpy 
-def readCSV(file_name):
+def leeCSV(file_name):
     """carga el fichero csv especificado y lo
      devuelve en un array de numpy"""
     valores = read_csv(file_name, header = None).to_numpy()
     return valores.astype(float)
 
-def descensoGradiente():
-    datos = readCSV("ex1data1.csv")
+def regLinealUnaVariable():
+    datos = leeCSV("ex1data1.csv")
     #   los arrays de la siguiente manera [:, 0] nos devuelve en X los elementos de la primera columna
     X = datos[:, 0]
     #   los arrays de la siguiente manera [:, 1] nos devuelve en Y los elementos de la primera columna
@@ -26,35 +31,59 @@ def descensoGradiente():
     #   
     for _ in range(1500):
         sum_0 = sum_1 = 0
-        # h0(x) por el modelo lineal es = theta_0 + theta_1 * x
+        #   h0(x) por el modelo lineal es = theta_0 + theta_1 * x
         for i in range(m):
-            # valores de los sumatorios para la formula del descenso de gradiente
+            #   valores de los sumatorios para la formula del descenso de gradiente
             sum_0 += (theta_0 + theta_1 * X[i]) - Y[i]
             sum_1 += ((theta_0 + theta_1 * X[i]) - Y[i]) * X[i]
         
-        # formulas del gradiente para theta0 y theta1
+        #   formulas del gradiente para theta0 y theta1
         theta_0 = theta_0 - (alpha / m) * sum_0
         theta_1 = theta_1 - (alpha / m) * sum_1
     
-    # dibujamos la grafica
+    #   dibujamos la grafica
     plt.plot(X, Y, "x")
     min_x = min(X)
     max_x = max(X)
     min_y = theta_0 + theta_1 * min_x
     max_y = theta_0 + theta_1 * max_x
     plt.plot([min_x, max_x], [min_y, max_y])
-    plt.savefig("resultado.png")   
-            
+    plt.savefig("resultado.png")
+    
+    #plt.contourf(makeData([-10, 10], [-1, 4], [min_x, max_x], [min_y, max_y]), np.logspace(-2, 3, 20))
+    #plt.savefig("Countour.png")
 
+#
+def coste(X, Y, Theta):
+    H = np.dot(X, Theta)
+    Aux = (H - Y) ** 2
+    return Aux.sum() / (2 * len(X))
+   
 
 #   Genera las matrices Theta0, Theta1, conste para generar un plot en 3d
 #   del coste para valores de theta_0 en el intervalo t0_range y valores de theta_1
 #   en el intervalor de t1_range
-def makeData(t0_range, t1_range,X,Y):
+def makeData(t0_range, t1_range, X ,Y):
     step = 0.1
+    # np.arange nos crea un numpy array desde t0_range[0] hasta t0_range[1] de step en step
+    # ejemplo: np.arange(2, 10, 3) da de resultado [2, 5, 8]
+    Theta0 = np.arange(t0_range[0], t0_range[1], step)
+    Theta1 = np.arange(t1_range[0], t1_range[1], step)
+    #   Para generar el grid de valores de theta0 = 0 y theta1 = 0 en sus intervalos
+    Theta0, Theta1 = np.meshgrid(Theta0, Theta1)
+    #   Creamos una copia de theta0
+    Coste = np.empty_like(Theta0)
+    #   Para todos los elementos de theta0
+    for ix, iy in np.ndindex(Theta0.shape):
+        #   Actualizamos valor de coste
+        Coste[ix, iy] = coste(X, Y ,[Theta0[ix, iy], Theta1[ix, iy]])
+
+    plt.contour(Theta0, Theta1, Coste, np.logspace(-2, 3, 20), colors='blue')
+    plt.show()
+    #   Devolvemos la tupla
+    return [Theta0, Theta1, Coste]
 
 
-#arrayValores =  read_csv("ex1data1.csv")
-#print(arrayValores)
 
-descensoGradiente()
+#regLinealUnaVariable()
+makeData([-10, 10], [-1, 4], [-10, 10], [-1, 4])
