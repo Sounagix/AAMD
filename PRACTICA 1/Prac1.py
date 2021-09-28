@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
 #   Para importar el parseador de frame a numpy
 from pandas.io.parsers import read_csv
-#
+#   
 from mpl_toolkits.mplot3d import Axes3D
 #
-# from matplotlib.ticker import L
+from matplotlib.ticker import LinearLocator,FormatStrFormatter
+
+from matplotlib import cm
 
 # Lee un archivo csv pasando el nombre del fichero a leer y devuelve un array de numpy 
 def leeCSV(file_name):
@@ -53,12 +54,27 @@ def regLinealUnaVariable():
     #plt.contourf(makeData([-10, 10], [-1, 4], [min_x, max_x], [min_y, max_y]), np.logspace(-2, 3, 20))
     #plt.savefig("Countour.png")
 
-#
+#   Para determinar el coste de un trazo en la gradiente
 def coste(X, Y, Theta):
-    H = np.dot(X, Theta)
+    H = Theta[0] + X * Theta[1]
     Aux = (H - Y) ** 2
     return Aux.sum() / (2 * len(X))
-   
+
+#   Introduciomos los datos en la gráfica y mostramos el resultado
+def countourGraph(a, b, c):
+    plt.contour(a, b, c, np.logspace(-2, 3, 20), colors='blue')
+    plt.savefig("representacion2D.png")
+
+def surfaceGraph(a, b, c):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d') 
+    surf = ax.plot_surface(a, b, c, cmap = cm.coolwarm, linewidth = 0, antialiased = False)
+    # Customizar el eje Z
+    ax.set_zlim(0, 700)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.savefig("representacion3D.png")
 
 #   Genera las matrices Theta0, Theta1, conste para generar un plot en 3d
 #   del coste para valores de theta_0 en el intervalo t0_range y valores de theta_1
@@ -67,23 +83,34 @@ def makeData(t0_range, t1_range, X ,Y):
     step = 0.1
     # np.arange nos crea un numpy array desde t0_range[0] hasta t0_range[1] de step en step
     # ejemplo: np.arange(2, 10, 3) da de resultado [2, 5, 8]
-    Theta0 = np.arange(t0_range[0], t0_range[1], step)
-    Theta1 = np.arange(t1_range[0], t1_range[1], step)
+    Theta0 = np.arange(t0_range[0], t0_range[1], step) # [-10, -9.9, -9.8....10]
+    Theta1 = np.arange(t1_range[0], t1_range[1], step) # [-1, -0.9, -0.8...4]
     #   Para generar el grid de valores de theta0 = 0 y theta1 = 0 en sus intervalos
     Theta0, Theta1 = np.meshgrid(Theta0, Theta1)
+
     #   Creamos una copia de theta0
     Coste = np.empty_like(Theta0)
     #   Para todos los elementos de theta0
     for ix, iy in np.ndindex(Theta0.shape):
         #   Actualizamos valor de coste
         Coste[ix, iy] = coste(X, Y ,[Theta0[ix, iy], Theta1[ix, iy]])
-
-    plt.contour(Theta0, Theta1, Coste, np.logspace(-2, 3, 20), colors='blue')
-    plt.show()
+    
     #   Devolvemos la tupla
     return [Theta0, Theta1, Coste]
 
-
-
 #regLinealUnaVariable()
-makeData([-10, 10], [-1, 4], [-10, 10], [-1, 4])
+
+valores = leeCSV("ex1data1.csv")
+t0_range = [-10, 10]
+t1_range = [-1, 4]
+X = valores[:, 0]
+Y = valores[:, 1]
+
+data = makeData(t0_range, t1_range, X, Y)
+
+# Dibujamos la grafica en 2D
+countourGraph(data[0], data[1], data[2])
+# Dibujamos la grafica en 3D
+surfaceGraph(data[0], data[1], data[2])
+
+plt.show()
