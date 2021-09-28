@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 #   Para importar el parseador de frame a numpy
 from pandas.io.parsers import read_csv
 #   
@@ -135,9 +136,10 @@ def gradiente(X, Y, Theta, alpha):
     
     #CREO QUE ESTA VERSION ES CORRECTA Y NO USA BUCLES ASI QUE CREO QUE ESTA BIEN, SOLO USA EL BUCLE DE CUANTAS VECES
     #LO REPITE
+    costes = np.empty_like(Theta)
+    NuevaTheta = Theta
     for _ in range(1500):
-        NuevaTheta = Theta
-        costes = np.empty_like(Theta)
+        #Creo que esto es lo que hay que terminar
         # Calculo de la h sub teta que es = igual al sumatorio de x0 * theta0 + x1 * theta1.... + xN * thetaN
         H = (Theta * X).sum()
         Aux = (H - Y) * X
@@ -150,23 +152,22 @@ def gradiente(X, Y, Theta, alpha):
 
 ###################################### LLAMADAS APARTADO 1 PRACTICA 1 ########################################################
 
-valores = leeCSV("ex1data1.csv")
-t0_range = [-10, 10]
-t1_range = [-1, 4]
-X = valores[:, 0]
-Y = valores[:, 1]
-data = makeData(t0_range, t1_range, X, Y)
-# Dibujamos la grafica en 2D
-countourGraph(data[0], data[1], data[2])
-# Dibujamos la grafica en 3D
-surfaceGraph(data[0], data[1], data[2])
+# valores = leeCSV("ex1data1.csv")
+# t0_range = [-10, 10]
+# t1_range = [-1, 4]
+# X = valores[:, 0]
+# Y = valores[:, 1]
+# data = makeData(t0_range, t1_range, X, Y)
+# # Dibujamos la grafica en 2D
+# countourGraph(data[0], data[1], data[2])
+# # Dibujamos la grafica en 3D
+# surfaceGraph(data[0], data[1], data[2])
 
 ###################################### LLAMADAS APARTADO 2 PRACTICA 1 ########################################################
 
 valoresCasas = leeCSV("ex1data2.csv")
-X = valoresCasas[:, :-1]  # (97, 1)
-print(X)
-Y = valoresCasas[:, -1] # (97,)
+X = valoresCasas[:, :-1] 
+Y = valoresCasas[:, -1]
 m = np.shape(X)[0] 
 n = np.shape(X)[1]  
 temp = X
@@ -179,8 +180,10 @@ matrizNorm, media, desviacion = normalizeMat(X)
 alpha = 0.01
 
 #hay que hacer una matriz de theta random si no me equivoco
-
-Thetas, costes = gradiente(matrizNorm, X,Y, alpha)
+#ThetaOrig = np.random.uniform (0, 1, (m, n))
+ThetaOrig = np.random.uniform(0, 1, (n, m))
+print(ThetaOrig)
+Theta, costes = gradiente(X,Y, ThetaOrig, alpha)
 
 # n = [n[1] for n in X]
 # min_x = np.min(n)
@@ -190,8 +193,8 @@ Thetas, costes = gradiente(matrizNorm, X,Y, alpha)
 
 min_x = min(X)
 max_x = max(X)
-min_y = Thetas[0] + Thetas[1] * min_x
-max_y = Thetas[0] + Thetas[1] * max_x
+min_y = Theta[0] + Theta[1] * min_x
+max_y = Theta[0] + Theta[1] * max_x
 
 draw_2D(temp,Y,[min_x, max_x], [min_y, max_y])
 
