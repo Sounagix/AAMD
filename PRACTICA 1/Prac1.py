@@ -76,6 +76,11 @@ def surfaceGraph(a, b, c):
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.savefig("representacion3D.png")
 
+def draw_2D(X, Y, a, b):
+    plt.figure()
+    plt.scatter(X ,Y, marker='x', c='r')
+    plt.plot(a, b)
+
 #   Genera las matrices Theta0, Theta1, conste para generar un plot en 3d
 #   del coste para valores de theta_0 en el intervalo t0_range y valores de theta_1
 #   en el intervalor de t1_range
@@ -98,19 +103,62 @@ def makeData(t0_range, t1_range, X ,Y):
     #   Devolvemos la tupla
     return [Theta0, Theta1, Coste]
 
-#regLinealUnaVariable()
+#   Devuelve en función de una matriz, la misma matriz normalizada, la media
+#   y desviación estandar de cada atributo 
+def normalizeMat(matriz):
+    desviacion = np.std(matriz)
+    media = np.mean(matriz)
+    minimo = matriz.min()
+    maximo = matriz.max()
+    matrizNorm = (matriz - minimo) / (maximo - minimo)
+    return [matrizNorm, media, desviacion]  
 
+def gradiente(X, Y, Theta, alpha):
+    NuevaTheta = Theta
+    m = np.shape(X)[0]
+    n = np.shape(X)[1]
+    #H = np.dot(X, Theta)
+    H = Theta[0] + X * Theta[1]
+    Aux = (H - Y)
+    costes = np.empty_like(Theta)
+    for i in range(n):
+        Aux_i = Aux * X[:, i]
+        NuevaTheta[i] -= (alpha / m) * Aux_i.sum()
+        costes = coste(X, Y, NuevaTheta)
+    return NuevaTheta, costes
+
+# Apartado 1 Práctica
 valores = leeCSV("ex1data1.csv")
 t0_range = [-10, 10]
 t1_range = [-1, 4]
 X = valores[:, 0]
 Y = valores[:, 1]
-
 data = makeData(t0_range, t1_range, X, Y)
-
 # Dibujamos la grafica en 2D
 countourGraph(data[0], data[1], data[2])
 # Dibujamos la grafica en 3D
 surfaceGraph(data[0], data[1], data[2])
 
+# Apartado 2 Práctica
+valoresCasas = leeCSV("ex1data2.csv")
+X = valoresCasas[:, :-1]  # (97, 1)
+Y = valoresCasas[:, -1] # (97,)
+m = np.shape(X)[0] 
+n = np.shape(X)[1]  
+temp = X
+#   añadimos una columna de 1's a la X para poder multiplicar con theta
+X = np.hstack([np.ones([m, 1]), X])
+
+matrizNorm, media, desviacion = normalizeMat(X)
+
+alpha = 0.01
+Thetas, costes = gradiente(matrizNorm, X,Y, alpha)
+
+n = [n[1] for n in X]
+min_x = np.min(n)
+max_x = np.max(X)
+min_y = Thetas[0] + Thetas[1] * min_x
+max_y = Thetas[0] + Thetas[1] * max_x
+draw_2D(temp,Y,[min_x, max_x], [min_y, max_y])
+#   Tamaño en pies cuadrados -> num habitaciones -> precio
 plt.show()
