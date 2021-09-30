@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
 #   Para importar el parseador de frame a numpy
 from pandas.io.parsers import read_csv
 #   
@@ -17,7 +16,7 @@ def leeCSV(file_name):
     valores = read_csv(file_name, header = None).to_numpy()
     return valores.astype(float)
 
-###################################### METODOS APARTADO 1 PRACTICA 1 ########################################################
+#region ##################################### METODOS APARTADO 1 PRACTICA 1 ########################################################
 
 # Metodo de descenso de gradiente para una sola variable
 def regLinealUnaVariable():
@@ -58,9 +57,15 @@ def regLinealUnaVariable():
     #plt.contourf(makeData([-10, 10], [-1, 4], [min_x, max_x], [min_y, max_y]), np.logspace(-2, 3, 20))
     #plt.savefig("Countour.png")
 
-#   Para determinar el coste de un trazo en la gradiente
+#   Para determinar el coste de un trazo en la gradiente, regresion lineal con una variable
 def coste(X, Y, Theta):
     H = Theta[0] + X * Theta[1]
+    Aux = (H - Y) ** 2
+    return Aux.sum() / (2 * len(X))
+
+#   Para determinar el coste de un trazo en la gradiente, regresion lineal con varias variables
+def costeVariables(X, Y, Theta):
+    H = np.dot(X, Theta)
     Aux = (H - Y) ** 2
     return Aux.sum() / (2 * len(X))
 
@@ -101,9 +106,9 @@ def makeData(t0_range, t1_range, X ,Y):
     
     #   Devolvemos la tupla
     return [Theta0, Theta1, Coste]
+# endregion
 
-
-###################################### METODOS APARTADO 2 PRACTICA 1 ########################################################
+#region ##################################### METODOS APARTADO 2 PRACTICA 1 ########################################################
 
 def draw_2D(X, Y, a, b):
     plt.figure()
@@ -113,44 +118,52 @@ def draw_2D(X, Y, a, b):
 #   Devuelve en función de una matriz, la misma matriz normalizada, la media
 #   y desviación estandar de cada atributo 
 def normalizeMat(matriz):
-    desviacion = np.std(matriz)
-    media = np.mean(matriz)
+    desviacion = np.std(matriz, axis=0)
+    print(desviacion)
+    media = np.mean(matriz, axis=0)
+    print(media)
     # he cambiado la formula la acaba de decir en clase
     matrizNorm = (matriz - media) / desviacion
+    print(matriz)
     return [matrizNorm, media, desviacion]  
 
 # Metodo de descenso de gradiente  para mas de una variable
-def gradiente(X, Y, Theta, alpha):
-    # NuevaTheta = Theta
-    # m = np.shape(X)[0]
-    # n = np.shape(X)[1]
-    # #H = np.dot(X, Theta)
-    # H = Theta[0] + X * Theta[1]
-    # Aux = (H - Y)
-    # costes = np.empty_like(Theta)
-    # for i in range(n):
-    #     Aux_i = Aux * X[:, i]
-    #     NuevaTheta[i] -= (alpha / m) * Aux_i.sum()
-    #     costes = coste(X, Y, NuevaTheta)
+def gradiente(X, Y, alpha):
+    m = np.shape(X)[0]
+    n = np.shape(X)[1]
+    NuevaTheta = np.zeros(n)
+    H = np.dot(X, NuevaTheta)
+    Aux = (H - Y)   
+    costes = np.empty_like(NuevaTheta)
+    
+    for _ in range(1500):
+        for i in range(n):
+             Aux_i = Aux * X[:, i]
+             NuevaTheta[i] -= (alpha / m) * Aux_i.sum()
+             costes = costeVariables(X, Y, NuevaTheta)
+             #print(costes)
 
     
     #CREO QUE ESTA VERSION ES CORRECTA Y NO USA BUCLES ASI QUE CREO QUE ESTA BIEN, SOLO USA EL BUCLE DE CUANTAS VECES
     #LO REPITE
-    costes = np.empty_like(Theta)
-    NuevaTheta = Theta
-    for _ in range(1500):
-        #Creo que esto es lo que hay que terminar
-        # Calculo de la h sub teta que es = igual al sumatorio de x0 * theta0 + x1 * theta1.... + xN * thetaN
-        H = (Theta * X).sum()
-        Aux = (H - Y) * X
-        # Sacamos la NuevaTheta a partir de la funcion de coste
-        NuevaTheta = Theta - ((alpha * Aux) / len(X))
-        costes = coste(X, Y, NuevaTheta)
+    # NuevaTheta = np.random.uniform(0, 1, (np.shape(X)[1], np.shape(X)[0]))
+    # costes = np.empty_like(NuevaTheta)
+    # for _ in range(1500):
+    #     # Calculo de la h sub teta que es = igual al sumatorio de x0 * theta0 + x1 * theta1.... + xN * thetaN
+    #     # H = (np.transpose(Theta) * X).sum()
+    #     H = np.transpose(NuevaTheta) * X
+    #     #H = np.sum(Theta * X)
+
+    #     # Sacamos la NuevaTheta a partir de la derivada de la funcion de coste multiplicada por alpha y restada por
+    #     # la propia theta
+    #     NuevaTheta = NuevaTheta - ((alpha * (H - Y) * X) / len(X))
+    #     costes = coste(X, Y, NuevaTheta)
     
     return NuevaTheta, costes
 
+#endregion
 
-###################################### LLAMADAS APARTADO 1 PRACTICA 1 ########################################################
+#region ##################################### LLAMADAS APARTADO 1 PRACTICA 1 ########################################################
 
 # valores = leeCSV("ex1data1.csv")
 # t0_range = [-10, 10]
@@ -162,15 +175,24 @@ def gradiente(X, Y, Theta, alpha):
 # countourGraph(data[0], data[1], data[2])
 # # Dibujamos la grafica en 3D
 # surfaceGraph(data[0], data[1], data[2])
+#endregion
 
-###################################### LLAMADAS APARTADO 2 PRACTICA 1 ########################################################
+#region ##################################### LLAMADAS APARTADO 2 PRACTICA 1 ########################################################
 
 valoresCasas = leeCSV("ex1data2.csv")
 X = valoresCasas[:, :-1] 
 Y = valoresCasas[:, -1]
 m = np.shape(X)[0] 
 n = np.shape(X)[1]  
-temp = X
+
+datos = carga_csv("datos2.csv")
+# Data loading
+N = datos.shape[0]
+np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
+col = datos.shape[1]-1
+X = datos[:,:col]
+Y = datos[:,col:]
+normX, mu, sigma = normalize(X)
 
 # Añadimos una columna de 1's a la X para poder multiplicar con theta
 X = np.hstack([np.ones([m, 1]), X])
@@ -179,24 +201,15 @@ matrizNorm, media, desviacion = normalizeMat(X)
 
 alpha = 0.01
 
-#hay que hacer una matriz de theta random si no me equivoco
-#ThetaOrig = np.random.uniform (0, 1, (m, n))
-ThetaOrig = np.random.uniform(0, 1, (n, m))
-print(ThetaOrig)
-Theta, costes = gradiente(X,Y, ThetaOrig, alpha)
+Theta, costes = gradiente(matrizNorm, Y, alpha)
 
-# n = [n[1] for n in X]
-# min_x = np.min(n)
+# min_x = np.min(X)
 # max_x = np.max(X)
-# min_y = Thetas[0] + Thetas[1] * min_x
-# max_y = Thetas[0] + Thetas[1] * max_x
+# min_y = Theta[0] + Theta[1] * min_x
+# max_y = Theta[0] + Theta[1] * max_x
 
-min_x = min(X)
-max_x = max(X)
-min_y = Theta[0] + Theta[1] * min_x
-max_y = Theta[0] + Theta[1] * max_x
-
-draw_2D(temp,Y,[min_x, max_x], [min_y, max_y])
+#draw_2D(temp,Y,[min_x, max_x], [min_y, max_y])
 
 #   Tamaño en pies cuadrados -> num habitaciones -> precio
-plt.show()
+# plt.show()
+#endregion
