@@ -157,16 +157,18 @@ def evolucion_coste():
 
 #region ##################################### LLAMADAS APARTADO 1 PRACTICA 1 ########################################################
 
-# valores = leeCSV("ex1data1.csv")
-# t0_range = [-10, 10]
-# t1_range = [-1, 4]
-# X = valores[:, 0]
-# Y = valores[:, 1]
-# data = makeData(t0_range, t1_range, X, Y)
-# # Dibujamos la grafica en 2D
-# countourGraph(data[0], data[1], data[2])
-# # Dibujamos la grafica en 3D
-# surfaceGraph(data[0], data[1], data[2])
+#regLinealUnaVariable()
+
+valores = leeCSV("ex1data1.csv")
+t0_range = [-10, 10]
+t1_range = [-1, 4]
+X = valores[:, 0]
+Y = valores[:, 1]
+data = makeData(t0_range, t1_range, X, Y)
+# Dibujamos la grafica en 2D
+countourGraph(data[0], data[1], data[2])
+# Dibujamos la grafica en 3D
+surfaceGraph(data[0], data[1], data[2])
 #endregion
 
 #region ##################################### LLAMADAS APARTADO 2 PRACTICA 1 ########################################################
