@@ -138,7 +138,8 @@ def gradiente():
     for i in range(1500):
         #calculamos h de theta usando la transpuesta de theta por la matriz normalizada
         H = np.dot(matrizNorm, np.transpose(theta))
-        #a continuacion calcularemos el valor cada valor de theta, es decir un valor por cada variable
+        #a continuacion calcularemos el valor cada valor de theta, es decir un valor por 
+        # cada variable
         for j in range(np.shape(matrizNorm)[1]):
             aux_j = (H - Y) * matrizNorm[:, j]
             theta[j] -= (alpha / m) * aux_j.sum()
@@ -154,6 +155,15 @@ def evolucion_coste():
     plt.plot(x, costes)
     plt.savefig("evolucionCostes.png")
 #endregion
+
+# Ecuacion normal
+def ecuacion_normal():
+    X_tran = np.transpose(X)
+    inver = np.linalg.pinv(np.dot(X_tran, X))
+    p = np.dot(inver, X_tran)
+    return np.matmul(p, Y)
+
+#region 
 
 #region ##################################### LLAMADAS APARTADO 1 PRACTICA 1 ########################################################
 
@@ -189,12 +199,6 @@ alpha = 0.01
 Theta, costes = gradiente()
 evolucion_coste()
 
-# Ecuacion normal
-def ecuacion_normal():
-    X_tran = np.transpose(X)
-    inver = np.linalg.pinv(np.dot(X_tran, X))
-    p = np.dot(inver, X_tran)
-    return np.matmul(p, Y)
 
 plt.show()
 #endregion
