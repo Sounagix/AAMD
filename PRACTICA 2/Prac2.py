@@ -20,9 +20,22 @@ def leeCSV(file_name):
     return valores.astype(float)
 
 ################################# 1.2 FUNCION SIGMOIDE ########################################
-def func_sigmoide():
+def func_sigmoide(valor, theta):
+    return 1 / (1 + np.exp(-np.transpose(theta) * valor))
 
-    return 1
+################################################################################################
+
+######################## 1.3 CALCULO DE LA FUNCION DE COSTE Y SU GRADIENTE #####################
+def cost(theta, X, Y):
+    # H = sigmoid(np.matmul(X, np.transpose(theta)))
+    H = func_sigmoide(np.matmul(X, theta))
+    # cost = (- 1 / (len(X))) * np.sum( Y * np.log(H) + (1 - Y) * np.log(1 - H))
+    cost = (- 1 / (len(X))) * (np.dot(Y, np.log(H)) +
+                               np.dot((1 - Y), np.log(1 - H)))
+    return cost
+
+def gradient(theta, XX, Y):
+    H = func_sigmoide(np.matmul(XX, theta))
 
 ################################################################################################
 
